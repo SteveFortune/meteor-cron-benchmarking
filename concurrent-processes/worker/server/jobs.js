@@ -1,7 +1,18 @@
 
 var log = console.log.bind(console);
 
+function rollbackJobs() {
+  Msgs.update({
+    doneAt: { $exists: false },
+    startedAt: { $exists: true }
+  }, {
+    $unset: { startedAt: "" }
+  });
+}
+
 Meteor.startup(function() {
+
+  rollbackJobs();
 
   var jobHash = 'cpuBoundOp' + process.env.PORT;
 
