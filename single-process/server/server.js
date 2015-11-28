@@ -1,9 +1,5 @@
 
 var log = console.log.bind(console);
-var msgPredicate = {
-  doneAt: { $exists: false },
-  startedAt: { $exists: false }
-};
 
 Meteor.methods({
   pushBigJob: function() {
@@ -15,7 +11,7 @@ Meteor.methods({
 });
 
 Meteor.publish('pendingJobs', function() {
-  return Msgs.find(msgPredicate);
+  return Msgs.find({ doneAt: { $exists: false } });
 });
 
 Meteor.startup(function() {
@@ -40,14 +36,19 @@ Meteor.startup(function() {
     },
     job: function() {
 
-      log('- Tick. ' + Msgs.find(msgPredicate).count() + ' pending jobs on the queue.');
+      var predicate = {
+        doneAt: { $exists: false },
+        startedAt: { $exists: false }
+      };
 
-      var topJob = Msgs.findOne(msgPredicate);
+      log('- Tick. ' + Msgs.find(predicate).count() + ' pending jobs on the queue.');
+
+      var topJob = Msgs.findOne(predicate);
       if (!topJob) {
         return;
       }
 
-      var nModified = Msgs.update(_.extend({}, msgPredicate, { _id: topJob._id }), {
+      var nModified = Msgs.update(_.extend({}, predicate, { _id: topJob._id }), {
         $set: { startedAt: new Date() }
       });
       if (!nModified) {

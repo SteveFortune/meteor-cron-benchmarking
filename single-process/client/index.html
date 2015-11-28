@@ -1,0 +1,29 @@
+<head>
+  <title>Single Process</title>
+</head>
+
+<body>
+  <h1>Welcome to the single-process app!</h1>
+  {{> bench}}
+  {{> jobs}}
+</body>
+
+<template name="bench">
+  <p>Pinged the server {{counter}} times.</p>
+  <p>Last call took {{lastMs}} ms.</p>
+  <p>Longest call took {{longestMs}} ms.</p>
+  <button id="trigger">Trigger Big Job</button>
+  <button id="clear">Clear Metrics</button>
+</template>
+
+<template name="jobs">
+  <ul>
+  {{#each jobs}}
+    {{#if this.startedAt }}
+      <b><li>Started Job: {{this.startedAt}}</li></b>
+    {{else}}
+      <li>Job: {{this.scheduleAt}}</li>
+    {{/if}}
+  {{/each}}
+  </ul>
+</template>
