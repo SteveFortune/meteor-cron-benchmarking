@@ -36,8 +36,6 @@ Template.bench.events({
 function timePing() {
 
   var tStart = performance.now();
-  var count = Session.get('counter');
-  var longest = Session.get('longestMs');
 
   Meteor.call('ping', function(err, pong) {
     var tEnd = performance.now();
@@ -45,6 +43,8 @@ function timePing() {
     if (err) {
       log('- Ping failed with ' + err);
     } else {
+      var count = Session.get('counter');
+      var longest = Session.get('longestMs');
       Session.set('lastMs', t);
       Session.set('counter', count + 1);
       if (t > longest) {
@@ -63,7 +63,7 @@ function cancelPing() {
 
 function schedulePing() {
   cancelPing();
-  pingTimer = setTimeout(timePing, 1000);
+  pingTimer = setTimeout(timePing, 200);
 }
 
 Meteor.subscribe('pendingJobs');

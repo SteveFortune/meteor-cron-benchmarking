@@ -1,20 +1,9 @@
 
 var log = console.log.bind(console);
 
-function rollbackJobs() {
-  Msgs.update({
-    doneAt: { $exists: false },
-    startedAt: { $exists: true }
-  }, {
-    $unset: { startedAt: "" }
-  });
-}
-
 Meteor.startup(function() {
 
-  rollbackJobs();
-
-  var jobHash = 'cpuBoundOp' + process.env.PORT;
+  var jobHash = 'longOp' + process.env.PORT;
 
   SyncedCron.add({
     name: jobHash,
@@ -42,19 +31,18 @@ Meteor.startup(function() {
         return;
       }
 
-      log('- Performing some CPU-boudn task.');
-      // Some CPU-bound task which blocks the event loop
-      for (var i = 0, x = 0; i < 1000000000; i++) {
-        x = i / 2;
+      log('- Flooding the event queue, simulating lots of IO');
+
+      for (var i = 0, x = 0; i < 250000; i++) {
+        Meteor.setTimeout(function() {}, 0);
       }
+
+      log('- Flooded');
 
       Msgs.update(topJob._id, {
         $set: {
           doneAt: new Date(),
-          result: {
-            i: i,
-            x: x
-          }
+          result: i
         }
       });
 

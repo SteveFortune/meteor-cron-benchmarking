@@ -11,3 +11,7 @@ Meteor.methods({
 Meteor.publish('pendingJobs', function() {
   return Msgs.find({ doneAt: { $exists: false } });
 });
+
+Meteor.startup(function() {
+  Msgs.remove({});
+});
